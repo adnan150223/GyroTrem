@@ -1,0 +1,12 @@
+# Core dependencies for the project
+sentence-transformers==2.2.2       # For generating embeddings with Hugging Face models
+cassio                             # For initializing the Astra DB session
+langchain                          # For handling vector stores, prompts, and chains
+langchain-community                # Community-supported integrations, e.g., for Cassandra
+langchain-google-genai             # Optional: If Google Generative AI is required for other tasks
+google-auth                        # For Google authentication, if required by langchain-google-genai
+streamlit                          # For deploying a web interface with Streamlit
+pyttsx3                            # For text-to-speech functionality
+
+# Optional but recommended for handling environment variables
+python-dotenv                      # To load environment variables from a .env file
