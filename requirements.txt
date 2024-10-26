@@ -6,5 +6,5 @@ cassio
 langchain
 langchain-community
 streamlit
-pyttsx3
+gTTS==2.2.4 
 python-dotenv
