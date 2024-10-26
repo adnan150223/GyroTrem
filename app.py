@@ -5,9 +5,10 @@ from langchain.vectorstores.cassandra import Cassandra
 from langchain.indexes.vectorstore import VectorStoreIndexWrapper
 import cassio
 from dotenv import load_dotenv
-import pyttsx3
+from gtts import gTTS  # Import Google Text-to-Speech
 from sentence_transformers import SentenceTransformer
 from langchain.prompts.chat import ChatPromptTemplate
+import io  # Import io for in-memory file operations
 
 # Load environment variables
 load_dotenv()
@@ -54,10 +55,14 @@ with st.sidebar:
         user_question = handle_faq_click("What are common medications for tremors?")
     
     st.markdown("<h3 style='color: #007BFF;'>Feedback:</h3>", unsafe_allow_html=True)
-    if st.button("📝 Provide Feedback"):
-        feedback = st.text_area("Enter your feedback here:")
-        if st.button("Submit Feedback"):
-            st.success("Thank you for your feedback!")
+    
+    # Feedback buttons with responses
+    feedback = st.radio("How was your experience?", ["👍 Good Work", "👎 Needs Improvement"])
+    
+    if feedback == "👍 Good Work":
+        st.success("Thank you for your feedback! We're glad you're satisfied! 😊")
+    elif feedback == "👎 Needs Improvement":
+        st.warning("Thank you for your feedback! We’ll work to improve! 🙏")
 
     st.markdown("<h3 style='color: #007BFF;'>Resources:</h3>", unsafe_allow_html=True)
     if st.button("📚 View Article on Hand Tremors"):
@@ -149,13 +154,13 @@ chain = prompt_template | llm
 def clean_response(response):
     return response.content.replace('\n', ' ').strip()
 
-# Function to generate speech using pyttsx3 without saving the file
+# Function to generate speech using gTTS and stream it directly in Streamlit
 def generate_audio(text):
-    engine = pyttsx3.init()
-    engine.setProperty('rate', 150)
-    engine.setProperty('volume', 1)
-    engine.say(text)
-    engine.runAndWait()
+    tts = gTTS(text, lang='en')
+    audio_buffer = io.BytesIO()  # Create an in-memory bytes buffer
+    tts.write_to_fp(audio_buffer)  # Write audio to buffer
+    audio_buffer.seek(0)  # Move to the start of the buffer
+    st.audio(audio_buffer, format="audio/mp3")  # Play audio directly from buffer
 
 # Function to interact with the LLM, taking memory into account
 def ask_question(question):
@@ -188,7 +193,7 @@ if st.button("🧠 Ask the AI"):
     if user_question:
         answer = ask_question(user_question)
         st.write(f"**Answer:** {answer}")
-        generate_audio(answer)
+        generate_audio(answer)  # Generate audio without saving it
     else:
         st.warning("Please enter a question before asking the AI.")
 
